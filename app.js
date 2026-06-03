@@ -699,3 +699,19 @@ function formatDate(v) {
   if (!v) return "-";
   return new Date(v).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
 }
+async function deleteUsedPhone(id) {
+  if (!confirm("이 중고폰 내역을 삭제하시겠습니까?")) return;
+
+  const { error } = await supabaseClient
+    .from("used_phones")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("삭제 실패: " + error.message);
+    return;
+  }
+
+  alert("삭제 완료");
+  showUsedPhones();
+}
