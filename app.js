@@ -1,3 +1,4 @@
+alert("app.js 시작");
 const supabaseUrl = "https://bpqnsvjovrkzwihmfhma.supabase.co";
 const supabaseKey = "sb_publishable_WI4ATXwwpOeriBHVTPDPJg_MIWikOXl";
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
