@@ -7,46 +7,90 @@
 
 <link rel="stylesheet" href="style.css">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 </head>
 <body>
 
-<header>
-    <h1>백석점 CRM</h1>
-</header>
+<div class="layout">
 
-<div class="container">
+    <div class="sidebar">
 
-    <div class="card">
+        <div class="logo">
+            백석점 CRM
+        </div>
 
-        <h2>고객 등록</h2>
+        <div class="menu-item">
+            🏠 대시보드
+        </div>
 
-        <input id="name" placeholder="고객명">
+        <div class="menu-item">
+            👤 고객관리
+        </div>
 
-        <input id="phone" placeholder="개통번호">
+        <div class="menu-item">
+            📝 고객이력
+        </div>
 
-        <input id="carrier" placeholder="통신사">
+        <div class="menu-item">
+            📱 중고폰관리
+        </div>
 
-        <input id="plan" placeholder="요금제">
+        <div class="menu-item">
+            🔌 악세사리관리
+        </div>
 
-        <button onclick="saveCustomer()">
-            고객 저장
-        </button>
+        <div class="menu-item">
+            📅 금일할일
+        </div>
+
+        <div class="menu-item">
+            ⚙ 설정
+        </div>
 
     </div>
 
-    <div class="card">
+    <div class="main">
 
-        <h2>고객 목록</h2>
+        <h1>대시보드</h1>
 
-        <div id="customerList"></div>
+        <br>
+
+        <div class="card-grid">
+
+            <div class="card">
+                <h3>오늘 요금제 변경</h3>
+                <div class="number">0</div>
+            </div>
+
+            <div class="card">
+                <h3>오늘 부가서비스 해지</h3>
+                <div class="number">0</div>
+            </div>
+
+            <div class="card">
+                <h3>오늘 생일 고객</h3>
+                <div class="number">0</div>
+            </div>
+
+            <div class="card">
+                <h3>중고폰 재고</h3>
+                <div class="number">0</div>
+            </div>
+
+            <div class="card">
+                <h3>이번달 악세 매출</h3>
+                <div class="number">0원</div>
+            </div>
+
+            <div class="card">
+                <h3>이번달 방문 고객</h3>
+                <div class="number">0명</div>
+            </div>
+
+        </div>
 
     </div>
 
 </div>
-
-<script src="app.js"></script>
 
 </body>
 </html>
