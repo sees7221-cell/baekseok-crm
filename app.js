@@ -725,3 +725,122 @@ function formatDateTime(value) {
     minute: "2-digit"
   });
 }
+/* 페이백관리 */
+
+async function showPaybacks() {
+  setActive("paybacks");
+
+  mainArea.innerHTML = `
+    ${pageHeader("페이백관리", "월별 페이백 지급 내역을 관리합니다.")}
+
+    <div class="card">
+      <h2>페이백 등록</h2>
+
+      <div class="form-grid">
+        <input id="pay_customer_name" placeholder="고객명">
+        <input id="pay_customer_phone" placeholder="개통번호">
+        <input id="pay_amount" type="number" placeholder="금액">
+
+        <select id="pay_status">
+          <option value="미지급">미지급</option>
+          <option value="지급완료">지급완료</option>
+          <option value="보류">보류</option>
+        </select>
+
+        <input id="pay_date" type="date" value="${todayText()}">
+        <input id="pay_manager" placeholder="담당자" value="김석호">
+      </div>
+
+      <br>
+      <textarea id="pay_memo" placeholder="메모"></textarea>
+      <button onclick="savePayback()">페이백 저장</button>
+    </div>
+
+    <div class="card">
+      <h2>페이백 내역</h2>
+      <div id="paybackList">불러오는 중...</div>
+    </div>
+  `;
+
+  loadPaybacks();
+}
+
+async function savePayback() {
+  const item = {
+    customer_name: document.getElementById("pay_customer_name").value.trim(),
+    customer_phone: document.getElementById("pay_customer_phone").value.trim(),
+    amount: Number(document.getElementById("pay_amount").value || 0),
+    status: document.getElementById("pay_status").value,
+    pay_date: document.getElementById("pay_date").value || todayText(),
+    manager: document.getElementById("pay_manager").value.trim(),
+    memo: document.getElementById("pay_memo").value.trim()
+  };
+
+  if (!item.customer_name || !item.amount) {
+    alert("고객명과 금액은 필수입니다.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("paybacks")
+    .insert([item]);
+
+  if (error) {
+    alert("저장 실패: " + error.message);
+    return;
+  }
+
+  alert("저장 완료");
+  showPaybacks();
+}
+
+async function loadPaybacks() {
+  const { data, error } = await supabaseClient
+    .from("paybacks")
+    .select("*")
+    .order("id", { ascending: false });
+
+  const list = document.getElementById("paybackList");
+  if (!list) return;
+
+  if (error) {
+    list.innerHTML = "불러오기 실패: " + error.message;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    list.innerHTML = "<p class='empty'>등록된 페이백 내역이 없습니다.</p>";
+    return;
+  }
+
+  const monthStart = monthStartText();
+
+  const monthTotal = data
+    .filter(item => item.pay_date >= monthStart)
+    .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+
+  const unpaidTotal = data
+    .filter(item => item.status === "미지급")
+    .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+
+  list.innerHTML = `
+    <div class="notice">
+      이번달 페이백 총액: <b>${formatWon(monthTotal)}</b><br>
+      미지급 총액: <b>${formatWon(unpaidTotal)}</b>
+    </div>
+
+    ${data.map(item => `
+      <div class="list-row">
+        <div class="row-title">
+          <span>${safe(item.customer_name)} / ${safe(item.customer_phone)}</span>
+          <span class="badge">${safe(item.status)}</span>
+        </div>
+        <div class="row-meta">
+          금액: ${formatWon(item.amount)}<br>
+          지급일: ${item.pay_date || "-"} / 담당자: ${safe(item.manager)}<br>
+          ${safe(item.memo)}
+        </div>
+      </div>
+    `).join("")}
+  `;
+}
