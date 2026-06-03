@@ -1,1 +1,42 @@
-body{}
+body{
+    margin:0;
+    background:#f2f4f7;
+    font-family:sans-serif;
+}
+
+header{
+    background:#111827;
+    color:white;
+    padding:15px;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:12px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin-bottom:10px;
+    box-sizing:border-box;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    cursor:pointer;
+}
+
+.customer{
+    padding:10px;
+    border-bottom:1px solid #ddd;
+}
