@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-
   showDashboard();
 });
 
@@ -152,11 +151,140 @@ async function loadCustomers() {
   }
 
   list.innerHTML = data.map(c => `
-    <div class="customer">
+    <div class="customer" onclick="showCustomerDetail('${c.phone}')">
       <b>${c.name || ""}</b> / ${c.phone || ""}<br>
       ${c.carrier || ""} / ${c.plan || ""}<br>
       요금제변경: ${c.plan_change_date || "-"} / 부가해지: ${c.addon_end_date || "-"}<br>
       <small>${c.memo || ""}</small>
     </div>
   `).join("");
+}
+
+async function showCustomerDetail(phone) {
+  const { data: customer, error } = await supabaseClient
+    .from("customers")
+    .select("*")
+    .eq("phone", phone)
+    .single();
+
+  if (error) {
+    alert("고객정보 불러오기 실패: " + error.message);
+    return;
+  }
+
+  mainArea.innerHTML = `
+    <h1>고객 상세</h1>
+    <br>
+
+    <div class="card">
+      <h2>${customer.name}</h2>
+      <p><b>개통번호:</b> ${customer.phone}</p>
+      <p><b>생년월일:</b> ${customer.birth_date || "-"}</p>
+      <p><b>통신사:</b> ${customer.carrier || "-"}</p>
+      <p><b>요금제:</b> ${customer.plan || "-"}</p>
+      <p><b>요금제변경일:</b> ${customer.plan_change_date || "-"}</p>
+      <p><b>부가서비스해지일:</b> ${customer.addon_end_date || "-"}</p>
+      <p><b>특이사항:</b> ${customer.memo || "-"}</p>
+      <button onclick="showCustomers()">목록으로</button>
+    </div>
+
+    <div class="card">
+      <h2>고객이력 추가</h2>
+
+      <select id="log_type">
+        <option value="필름교체">필름교체</option>
+        <option value="상담">상담</option>
+        <option value="고장접수">고장접수</option>
+        <option value="요금문의">요금문의</option>
+        <option value="기기변경">기기변경</option>
+        <option value="번호이동">번호이동</option>
+        <option value="인터넷">인터넷</option>
+        <option value="TV">TV</option>
+        <option value="악세사리">악세사리</option>
+        <option value="기타">기타</option>
+      </select>
+
+      <textarea id="log_content" placeholder="내용 입력"></textarea>
+      <input id="log_writer" placeholder="작성자" value="김석호">
+
+      <button onclick="saveCustomerLog('${customer.phone}')">이력 저장</button>
+    </div>
+
+    <div class="card">
+      <h2>고객이력</h2>
+      <div id="customerLogList">불러오는 중...</div>
+    </div>
+  `;
+
+  loadCustomerLogs(customer.phone);
+}
+
+async function saveCustomerLog(phone) {
+  const log = {
+    customer_phone: phone,
+    log_type: document.getElementById("log_type").value,
+    content: document.getElementById("log_content").value.trim(),
+    writer: document.getElementById("log_writer").value.trim()
+  };
+
+  if (!log.content) {
+    alert("이력 내용을 입력하세요.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("customer_logs")
+    .insert([log]);
+
+  if (error) {
+    alert("이력 저장 실패: " + error.message);
+    return;
+  }
+
+  alert("이력 저장 완료");
+  showCustomerDetail(phone);
+}
+
+async function loadCustomerLogs(phone) {
+  const { data, error } = await supabaseClient
+    .from("customer_logs")
+    .select("*")
+    .eq("customer_phone", phone)
+    .order("id", { ascending: false });
+
+  const list = document.getElementById("customerLogList");
+  if (!list) return;
+
+  if (error) {
+    list.innerHTML = `<p>이력 불러오기 실패: ${error.message}</p>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    list.innerHTML = "<p>등록된 이력이 없습니다.</p>";
+    return;
+  }
+
+  list.innerHTML = data.map(log => `
+    <div class="customer">
+      <b>${log.log_type}</b><br>
+      ${log.content || ""}<br>
+      <small>${formatDateTime(log.created_at)} / ${log.writer || ""}</small>
+    </div>
+  `).join("");
+}
+
+function formatDateTime(value) {
+  if (!value) return "-";
+
+  const date = new Date(value);
+
+  return date.toLocaleString("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
 }
