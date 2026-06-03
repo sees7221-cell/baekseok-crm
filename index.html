@@ -1,1 +1,52 @@
-안녕하세요
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>백석점 CRM</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+<body>
+
+<header>
+    <h1>백석점 CRM</h1>
+</header>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>고객 등록</h2>
+
+        <input id="name" placeholder="고객명">
+
+        <input id="phone" placeholder="개통번호">
+
+        <input id="carrier" placeholder="통신사">
+
+        <input id="plan" placeholder="요금제">
+
+        <button onclick="saveCustomer()">
+            고객 저장
+        </button>
+
+    </div>
+
+    <div class="card">
+
+        <h2>고객 목록</h2>
+
+        <div id="customerList"></div>
+
+    </div>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
