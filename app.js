@@ -845,3 +845,33 @@ async function loadPaybacks() {
     `).join("")}
   `;
 }
+async function deleteCustomer(phone) {
+  const confirmDelete = confirm("정말 이 고객을 삭제하시겠습니까? 고객이력도 함께 삭제됩니다.");
+
+  if (!confirmDelete) {
+    return;
+  }
+
+  const { error: logError } = await supabaseClient
+    .from("customer_logs")
+    .delete()
+    .eq("customer_phone", phone);
+
+  if (logError) {
+    alert("고객이력 삭제 실패: " + logError.message);
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("customers")
+    .delete()
+    .eq("phone", phone);
+
+  if (error) {
+    alert("고객 삭제 실패: " + error.message);
+    return;
+  }
+
+  alert("고객 삭제 완료");
+  showCustomers();
+}
