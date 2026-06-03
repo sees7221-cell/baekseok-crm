@@ -319,10 +319,11 @@ async function showCustomerDetail(phone) {
       <p><b>부가서비스해지일:</b> ${customer.addon_end_date || "-"}</p>
       <p><b>특이사항:</b> ${customer.memo || "-"}</p>
 
-      <div class="table-actions">
-        <button class="btn-secondary" onclick="showCustomers()">목록으로</button>
-        <button onclick="showCustomerEdit('${customer.phone}')">고객정보 수정</button>
-      </div>
+<div class="table-actions">
+  <button class="btn-secondary" onclick="showCustomers()">목록으로</button>
+  <button onclick="showCustomerEdit('${customer.phone}')">고객정보 수정</button>
+  <button class="btn-danger" onclick="deleteCustomer('${customer.phone}')">고객 삭제</button>
+</div>
     </div>
 
     <div class="card">
