@@ -428,7 +428,28 @@ async function showUsedPhones() {
     </div>
   `;
 
-  loadUsedPhones();
+  loadUsedPhones(list.innerHTML = data.map(x => {
+  const profit = Number(x.sell_price || 0) - Number(x.buy_price || 0);
+
+  return `
+    <div class="list-row">
+      <div class="row-title">
+        <span>${safe(x.model_name)} / ${safe(x.customer_name)}</span>
+        <span class="badge">${safe(x.status)}</span>
+      </div>
+
+      <div class="row-meta">
+        매입가: ${won(x.buy_price)} / 판매가: ${won(x.sell_price)} / 수익: ${won(profit)}<br>
+        매입일: ${x.buy_date || "-"} / 판매일: ${x.sell_date || "-"}<br>
+        ${safe(x.memo)}
+      </div>
+
+      <div class="table-actions">
+        <button class="btn-danger" onclick="deleteUsedPhone(${x.id})">중고폰 삭제</button>
+      </div>
+    </div>
+  `;
+}).join(""););
 }
 
 async function saveUsedPhone() {
