@@ -61,3 +61,10 @@ body{
     font-weight:bold;
     margin-top:10px;
 }
+textarea{
+    width:100%;
+    min-height:80px;
+    padding:12px;
+    margin-bottom:10px;
+    box-sizing:border-box;
+}
