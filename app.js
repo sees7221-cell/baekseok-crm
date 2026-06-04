@@ -52,6 +52,8 @@ async function showDashboard() {
       <div class="card"><h3>오늘 부가서비스 해지</h3><div class="number" id="addonCount">0</div></div>
       <div class="card"><h3>오늘 생일 고객</h3><div class="number" id="birthCount">0</div></div>
       <div class="card"><h3>중고폰 재고</h3><div class="number" id="usedCount">0</div></div>
+      <div class="card"><h3>이번달 중고폰 수익</h3><div class="number" id="usedProfit">0원</div></div>
+<div class="card"><h3>이번달 중고폰 판매대수</h3><div class="number" id="usedSoldCount">0</div></div>
       <div class="card"><h3>이번달 악세 매출</h3><div class="number" id="accTotal">0원</div></div>
       <div class="card"><h3>미지급 페이백</h3><div class="number" id="payTotal">0원</div></div>
     </div>
@@ -94,6 +96,22 @@ async function loadDashboard() {
 
   const { data: used } = await supabaseClient.from("used_phones").select("*");
   document.getElementById("usedCount").innerText = (used || []).filter(x => x.status !== "판매완료").length;
+  const monthStart = new Date();
+monthStart.setDate(1);
+const monthStartTextValue = monthStart.toISOString().slice(0, 10);
+
+const usedSoldThisMonth = (used || []).filter(x =>
+  x.status === "판매완료" &&
+  x.sell_date &&
+  x.sell_date >= monthStartTextValue
+);
+
+const usedProfitThisMonth = usedSoldThisMonth.reduce((sum, x) => {
+  return sum + (Number(x.sell_price || 0) - Number(x.buy_price || 0));
+}, 0);
+
+document.getElementById("usedProfit").innerText = won(usedProfitThisMonth);
+document.getElementById("usedSoldCount").innerText = usedSoldThisMonth.length;
 
   const { data: acc } = await supabaseClient.from("accessories").select("*");
   const accTotal = (acc || []).reduce((sum, x) => sum + Number(x.amount || 0), 0);
