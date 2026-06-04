@@ -176,6 +176,7 @@ function showCustomers() {
         <input id="name" placeholder="고객명">
         <input id="phone" placeholder="개통번호">
         <input id="birth_date" type="date">
+        <input id="activation_date" type="date">
         <input id="carrier" placeholder="통신사">
         <input id="plan" placeholder="요금제">
         <input id="plan_change_date" type="date">
