@@ -297,18 +297,34 @@ async function loadCustomers() {
     return;
   }
 
-  list.innerHTML = data.map(c => `
-    <div class="customer" onclick="showCustomerDetail('${c.phone}')">
-      <div class="row-title">
-        <span>${safe(c.name)} / ${safe(c.phone)}</span>
-      </div>
-      <div class="row-meta">
-        ${safe(c.carrier)} / ${safe(c.plan)}<br>
-        요금제변경: ${c.plan_change_date || "-"} / 부가해지: ${c.addon_end_date || "-"}<br>
-        ${safe(c.memo)}
-      </div>
+list.innerHTML = data.map(c => `
+  <div class="list-row">
+
+    <div class="row-title">
+      <span><b>${safe(c.name)}</b></span>
+      <span class="badge">${safe(c.carrier || "-")}</span>
     </div>
-  `).join("");
+
+    <div class="row-meta">
+      📞 ${safe(c.phone)}<br><br>
+
+      요금제 : ${safe(c.plan || "-")}<br>
+
+      개통일 : ${c.activation_date || "-"}<br>
+
+      요금제 변경일 : ${c.plan_change_date || "-"}<br>
+
+      부가서비스 해지일 : ${c.addon_end_date || "-"}
+    </div>
+
+    <div class="table-actions">
+      <button onclick="showCustomerDetail('${c.phone}')">
+        상세보기
+      </button>
+    </div>
+
+  </div>
+`).join("");
 }
 
 async function showCustomerDetail(phone) {
