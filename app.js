@@ -1346,3 +1346,47 @@ async function importCustomersCSV() {
 
   showCustomers();
 }
+async function importCustomersExcel() {
+  const file = document.getElementById("excelFile").files[0];
+
+  if (!file) {
+    alert("엑셀 파일을 선택하세요.");
+    return;
+  }
+
+  const data = await file.arrayBuffer();
+  const workbook = XLSX.read(data);
+
+  const sheetName = workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+
+  const rows = XLSX.utils.sheet_to_json(sheet);
+
+  const customers = rows.map(row => ({
+    name: row["고객명"] || row["성함"] || "",
+    phone: String(row["전화번호"] || row["개통번호"] || "").trim(),
+    birth_date: row["생년월일"] || null,
+    carrier: row["통신사"] || row["가입통신사"] || "",
+    plan: row["요금제"] || "",
+    plan_change_date: row["요금제변경일"] || row["요금제변경일자"] || null,
+    addon_end_date: row["부가해지일"] || row["부가서비스해지일자"] || null,
+    memo: row["메모"] || ""
+  })).filter(c => c.name && c.phone);
+
+  if (customers.length === 0) {
+    alert("업로드할 고객 데이터가 없습니다. 엑셀 첫 줄 제목을 확인하세요.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("customers")
+    .insert(customers);
+
+  if (error) {
+    alert("업로드 실패: " + error.message);
+    return;
+  }
+
+  alert(customers.length + "명 업로드 완료");
+  showCustomers();
+}
