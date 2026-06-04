@@ -1390,3 +1390,4 @@ async function importCustomersExcel() {
   alert(customers.length + "명 업로드 완료");
   showCustomers();
 }
+window.importCustomersExcel = importCustomersExcel;
