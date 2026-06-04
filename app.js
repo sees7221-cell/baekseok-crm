@@ -1378,9 +1378,11 @@ async function importCustomersExcel() {
     return;
   }
 
-  const { error } = await supabaseClient
-    .from("customers")
-    .insert(customers);
+const { error } = await supabaseClient
+  .from("customers")
+  .upsert(customers, {
+    onConflict: "phone"
+  });
 
   if (error) {
     alert("업로드 실패: " + error.message);
