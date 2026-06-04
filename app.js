@@ -1435,6 +1435,12 @@ async function importCustomersExcel() {
     birth_date: row["생년월일"] || null,
     carrier: row["통신사"] || row["가입통신사"] || "",
     plan: row["요금제"] || "",
+    activation_date:
+  row["가입일자"] ||
+  row["개통일"] ||
+  row["개통일자"] ||
+  row["가입일"] ||
+  null,
     plan_change_date: row["요금제변경일"] || row["요금제변경일자"] || null,
     addon_end_date: row["부가해지일"] || row["부가서비스해지일자"] || null,
     memo: row["메모"] || ""
