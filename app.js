@@ -762,6 +762,14 @@ async function loadPaybacks() {
           지급일: ${x.pay_date || "-"} / 담당자: ${safe(x.manager)}<br>
           ${safe(x.memo)}
         </div>
+        <div class="table-actions">
+  ${
+    x.status !== "지급완료"
+      ? `<button onclick="completePayback(${x.id})">지급완료</button>`
+      : ""
+  }
+  <button class="btn-danger" onclick="deletePayback(${x.id})">삭제</button>
+</div>
       </div>
     `).join("")}
   `;
@@ -788,4 +796,40 @@ function formatDate(v) {
   return new Date(v).toLocaleString("ko-KR", {
     timeZone: "Asia/Seoul"
   });
+}
+async function completePayback(id) {
+  if (!confirm("이 페이백을 지급완료 처리하시겠습니까?")) return;
+
+  const { error } = await supabaseClient
+    .from("paybacks")
+    .update({
+      status: "지급완료",
+      pay_date: todayText()
+    })
+    .eq("id", id);
+
+  if (error) {
+    alert("처리 실패: " + error.message);
+    return;
+  }
+
+  alert("지급완료 처리되었습니다.");
+  showPaybacks();
+}
+
+async function deletePayback(id) {
+  if (!confirm("이 페이백 내역을 삭제하시겠습니까?")) return;
+
+  const { error } = await supabaseClient
+    .from("paybacks")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("삭제 실패: " + error.message);
+    return;
+  }
+
+  alert("삭제 완료");
+  showPaybacks();
 }
