@@ -126,6 +126,35 @@ document.getElementById("usedSoldCount").innerText = usedSoldThisMonth.length;
 }
 
 function taskRow(c, type) {
+  let buttonHtml = "";
+
+  if (type === "요금제변경") {
+    buttonHtml = `<button onclick="completeTodayTask('${c.phone}', 'plan')">요금제변경 완료</button>`;
+  }
+
+  if (type === "부가해지") {
+    buttonHtml = `<button onclick="completeTodayTask('${c.phone}', 'addon')">부가해지 완료</button>`;
+  }
+
+  return `
+    <div class="list-row">
+      <div class="row-title">
+        <span>${safe(c.name)} / ${safe(c.phone)}</span>
+        <span class="badge">${type}</span>
+      </div>
+
+      <div class="row-meta">
+        ${safe(c.carrier)} / ${safe(c.plan)}<br>
+        ${safe(c.memo)}
+      </div>
+
+      <div class="table-actions">
+        <button onclick="showCustomerDetail('${c.phone}')">고객보기</button>
+        ${buttonHtml}
+      </div>
+    </div>
+  `;
+}
   return `
     <div class="list-row" onclick="showCustomerDetail('${c.phone}')">
       <div class="row-title">
@@ -1202,4 +1231,30 @@ async function downloadCustomerCSV() {
   URL.revokeObjectURL(url);
 
   alert("CSV 다운로드 완료");
+}
+async function completeTodayTask(phone, taskType) {
+  let updateData = {};
+
+  if (taskType === "plan") {
+    updateData.plan_change_date = null;
+  }
+
+  if (taskType === "addon") {
+    updateData.addon_end_date = null;
+  }
+
+  if (!confirm("처리완료 하시겠습니까?")) return;
+
+  const { error } = await supabaseClient
+    .from("customers")
+    .update(updateData)
+    .eq("phone", phone);
+
+  if (error) {
+    alert("처리 실패: " + error.message);
+    return;
+  }
+
+  alert("처리완료 되었습니다.");
+  showDashboard();
 }
