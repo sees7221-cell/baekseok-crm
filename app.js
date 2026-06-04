@@ -1433,3 +1433,13 @@ async function loadStats() {
     </div>
   `;
 }
+async function showStats() {
+  setActive("stats");
+
+  mainArea.innerHTML = `
+    <div class="card">
+      <h1>월별통계</h1>
+      <p>연결 성공</p>
+    </div>
+  `;
+}
