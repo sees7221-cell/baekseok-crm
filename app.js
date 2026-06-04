@@ -185,12 +185,12 @@ function showCustomers() {
       <br>
       <textarea id="memo" placeholder="특이사항"></textarea>
       <button onclick="saveCustomer()">고객 저장</button>
-      <br><br>
+<br><br>
 
-<input type="file" id="csvFile" accept=".csv">
+<input type="file" id="excelFile" accept=".xlsx,.xls">
 
-<button onclick="importCustomersCSV()">
-  CSV 고객 업로드
+<button onclick="importCustomersExcel()">
+  엑셀 고객 업로드
 </button>
     </div>
 
