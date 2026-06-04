@@ -660,8 +660,8 @@ async function loadAccessories() {
           판매일: ${x.sale_date || "-"} / 담당자: ${safe(x.manager)}
         </div>
         <div class="table-actions">
-  <button onclick="showAccessoryEdit(${x.id})">수정</button>
-  <button class="btn-danger" onclick="deleteAccessory(${x.id})">삭제</button>
+  <button type="button" onclick="event.stopPropagation(); showAccessoryEdit(${x.id});">수정</button>
+  <button type="button" class="btn-danger" onclick="event.stopPropagation(); deleteAccessory(${x.id});">삭제</button>
 </div>
       </div>
     `).join("")}
