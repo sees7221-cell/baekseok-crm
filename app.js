@@ -1414,6 +1414,35 @@ async function importCustomersCSV() {
 
   showCustomers();
 }
+function excelDateToText(value) {
+  if (!value) return null;
+
+  if (typeof value === "number") {
+    const date = XLSX.SSF.parse_date_code(value);
+    if (!date) return null;
+
+    const y = date.y;
+    const m = String(date.m).padStart(2, "0");
+    const d = String(date.d).padStart(2, "0");
+
+    return `${y}-${m}-${d}`;
+  }
+
+  if (typeof value === "string") {
+    const text = value.trim();
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+      return text;
+    }
+
+    if (/^\d{8}$/.test(text)) {
+      return `${text.slice(0, 4)}-${text.slice(4, 6)}-${text.slice(6, 8)}`;
+    }
+  }
+
+  return null;
+}
+
 async function importCustomersExcel() {
   const file = document.getElementById("excelFile").files[0];
 
@@ -1432,17 +1461,27 @@ async function importCustomersExcel() {
   let customers = rows.map(row => ({
     name: row["고객명"] || row["성함"] || "",
     phone: String(row["전화번호"] || row["개통번호"] || "").trim(),
-    birth_date: row["생년월일"] || null,
+    birth_date: String(row["생년월일"] || "").trim() || null,
     carrier: row["통신사"] || row["가입통신사"] || "",
     plan: row["요금제"] || "",
-    activation_date:
-  row["가입일자"] ||
-  row["개통일"] ||
-  row["개통일자"] ||
-  row["가입일"] ||
-  null,
-    plan_change_date: row["요금제변경일"] || row["요금제변경일자"] || null,
-    addon_end_date: row["부가해지일"] || row["부가서비스해지일자"] || null,
+
+    activation_date: excelDateToText(
+      row["가입일자"] ||
+      row["개통일"] ||
+      row["개통일자"] ||
+      row["가입일"]
+    ),
+
+    plan_change_date: excelDateToText(
+      row["요금제변경일"] ||
+      row["요금제변경일자"]
+    ),
+
+    addon_end_date: excelDateToText(
+      row["부가해지일"] ||
+      row["부가서비스해지일자"]
+    ),
+
     memo: row["메모"] || ""
   })).filter(c => c.name && c.phone);
 
