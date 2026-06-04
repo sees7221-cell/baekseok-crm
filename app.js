@@ -185,6 +185,13 @@ function showCustomers() {
       <br>
       <textarea id="memo" placeholder="특이사항"></textarea>
       <button onclick="saveCustomer()">고객 저장</button>
+      <br><br>
+
+<input type="file" id="csvFile" accept=".csv">
+
+<button onclick="importCustomersCSV()">
+  CSV 고객 업로드
+</button>
     </div>
 
     <div class="card">
@@ -1285,4 +1292,57 @@ async function deleteCustomerLog(id, phone) {
   alert("삭제 완료");
 
   showCustomerDetail(phone);
+}
+async function importCustomersCSV() {
+
+  const file =
+    document.getElementById("csvFile").files[0];
+
+  if (!file) {
+    alert("CSV 파일을 선택하세요.");
+    return;
+  }
+
+  const text = await file.text();
+
+  const lines =
+    text.split("\n").filter(x => x.trim());
+
+  const customers = [];
+
+  for (let i = 1; i < lines.length; i++) {
+
+    const cols = lines[i]
+      .split(",")
+      .map(x => x.replace(/"/g,"").trim());
+
+    customers.push({
+      name: cols[0] || "",
+      phone: cols[1] || "",
+      birth_date: cols[2] || null,
+      carrier: cols[3] || "",
+      plan: cols[4] || "",
+      plan_change_date: cols[5] || null,
+      addon_end_date: cols[6] || null,
+      memo: cols[7] || ""
+    });
+
+  }
+
+  const { error } =
+    await supabaseClient
+      .from("customers")
+      .insert(customers);
+
+  if (error) {
+    alert("업로드 실패 : " + error.message);
+    return;
+  }
+
+  alert(
+    customers.length +
+    "명 업로드 완료"
+  );
+
+  showCustomers();
 }
