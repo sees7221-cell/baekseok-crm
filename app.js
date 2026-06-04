@@ -1449,35 +1449,3 @@ async function importCustomersExcel() {
 }
 
 window.importCustomersExcel = importCustomersExcel;
-
-.list-row{
-  background:#fff;
-  border-radius:12px;
-  padding:15px;
-  margin-bottom:12px;
-  box-shadow:0 2px 6px rgba(0,0,0,.05);
-}
-
-.row-title{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-size:18px;
-  margin-bottom:10px;
-}
-
-.row-meta{
-  line-height:1.8;
-}
-
-.badge{
-  background:#eef2ff;
-  color:#334155;
-  padding:5px 10px;
-  border-radius:20px;
-  font-size:12px;
-}
-
-.table-actions{
-  margin-top:12px;
-}
