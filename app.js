@@ -172,16 +172,47 @@ function showCustomers() {
     <div class="card">
       <h2>고객 등록</h2>
 
-      <div class="form-grid">
-        <input id="name" placeholder="고객명">
-        <input id="phone" placeholder="개통번호">
-       <input id="birth_raw" placeholder="생년월일 예: 991219">
-        <input id="activation_date" type="date">
-        <input id="carrier" placeholder="통신사">
-        <input id="plan" placeholder="요금제">
-        <input id="plan_change_date" type="date">
-        <input id="addon_end_date" type="date">
-      </div>
+     <div class="form-grid">
+  <div>
+    <label>고객명</label>
+    <input id="name" placeholder="예: 홍길동">
+  </div>
+
+  <div>
+    <label>개통번호</label>
+    <input id="phone" placeholder="예: 01012345678">
+  </div>
+
+  <div>
+    <label>생년월일</label>
+    <input id="birth_date" placeholder="예: 991219">
+  </div>
+
+  <div>
+    <label>개통일</label>
+    <input id="activation_date" type="date">
+  </div>
+
+  <div>
+    <label>통신사</label>
+    <input id="carrier" placeholder="예: SK / KT / LG / MVNO">
+  </div>
+
+  <div>
+    <label>요금제</label>
+    <input id="plan" placeholder="예: 시니어 세이브">
+  </div>
+
+  <div>
+    <label>요금제 변경일</label>
+    <input id="plan_change_date" type="date">
+  </div>
+
+  <div>
+    <label>부가서비스 해지일</label>
+    <input id="addon_end_date" type="date">
+  </div>
+</div>
 
       <br>
       <textarea id="memo" placeholder="특이사항"></textarea>
