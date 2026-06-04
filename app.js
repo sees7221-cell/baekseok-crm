@@ -170,7 +170,32 @@ function showTodayTasks() {
   setActive("today");
   showDashboard();
 }
+async function completeTodayTask(phone, taskType) {
+  let updateData = {};
 
+  if (taskType === "plan") {
+    updateData.plan_change_date = null;
+  }
+
+  if (taskType === "addon") {
+    updateData.addon_end_date = null;
+  }
+
+  if (!confirm("처리완료 하시겠습니까?")) return;
+
+  const { error } = await supabaseClient
+    .from("customers")
+    .update(updateData)
+    .eq("phone", phone);
+
+  if (error) {
+    alert("처리 실패: " + error.message);
+    return;
+  }
+
+  alert("처리완료 되었습니다.");
+  showDashboard();
+}
 /* 고객관리 */
 
 function showCustomers() {
