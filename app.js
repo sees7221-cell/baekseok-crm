@@ -894,6 +894,9 @@ function showSettings() {
 
   mainArea.innerHTML = `
     ${header("설정", "CRM 설정")}
+    <button onclick="downloadCustomerCSV()">
+  고객 CSV 다운로드
+</button>
 
     <div class="card">
       <h2>백석점 CRM v1</h2>
@@ -1144,4 +1147,55 @@ async function loadCustomerSummary(phone) {
     최근내용: ${safe(latest.content)}<br>
     최근일자: ${formatDate(latest.created_at)}
   `;
+}
+async function downloadCustomerCSV() {
+
+  const { data, error } = await supabaseClient
+    .from("customers")
+    .select("*")
+    .order("id", { ascending: false });
+
+  if (error) {
+    alert("다운로드 실패 : " + error.message);
+    return;
+  }
+
+  let csv =
+    "고객명,전화번호,생년월일,통신사,요금제,요금제변경일,부가해지일,메모\n";
+
+  data.forEach(c => {
+
+    csv += `"${c.name || ""}",`;
+    csv += `"${c.phone || ""}",`;
+    csv += `"${c.birth_date || ""}",`;
+    csv += `"${c.carrier || ""}",`;
+    csv += `"${c.plan || ""}",`;
+    csv += `"${c.plan_change_date || ""}",`;
+    csv += `"${c.addon_end_date || ""}",`;
+    csv += `"${(c.memo || "").replace(/"/g,'""')}"\n`;
+
+  });
+
+  const blob = new Blob(
+    ["\ufeff" + csv],
+    { type: "text/csv;charset=utf-8;" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download =
+    `백석점고객백업_${todayText()}.csv`;
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+
+  alert("CSV 다운로드 완료");
 }
