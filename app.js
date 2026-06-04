@@ -474,6 +474,12 @@ async function loadCustomerLogs(phone) {
         <span class="badge">${safe(x.writer)}</span>
       </div>
       <div class="row-meta">${safe(x.content)}<br>${formatDate(x.created_at)}</div>
+      <div class="table-actions">
+  <button class="btn-danger"
+    onclick="deleteCustomerLog(${x.id}, '${phone}')">
+    이력삭제
+  </button>
+</div>
     </div>
   `).join("");
 }
@@ -1256,4 +1262,24 @@ async function completeTodayTask(phone, taskType) {
 
   alert("처리완료 되었습니다.");
   showDashboard();
+}
+async function deleteCustomerLog(id, phone) {
+
+  if (!confirm("이 고객이력을 삭제하시겠습니까?")) {
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("customer_logs")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("삭제 실패 : " + error.message);
+    return;
+  }
+
+  alert("삭제 완료");
+
+  showCustomerDetail(phone);
 }
