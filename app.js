@@ -75,7 +75,27 @@ async function loadDashboard() {
 
   const planList = (customers || []).filter(c => c.plan_change_date === today);
   const addonList = (customers || []).filter(c => c.addon_end_date === today);
-  const birthList = (customers || []).filter(c => c.birth_date && c.birth_date.slice(5) === monthDay);
+  const birthList = (customers || []).filter(c => {
+
+  if (!c.birth_date) return false;
+
+  const birth =
+    String(c.birth_date).replace(/[^0-9]/g, "");
+
+  const today =
+    monthDay.replace("-", "");
+
+  if (birth.length === 6) {
+    return birth.substring(2, 6) === today;
+  }
+
+  if (birth.length === 8) {
+    return birth.substring(4, 8) === today;
+  }
+
+  return false;
+
+});
 
   document.getElementById("planCount").innerText = planList.length;
   document.getElementById("addonCount").innerText = addonList.length;
