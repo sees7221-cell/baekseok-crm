@@ -534,9 +534,17 @@ async function loadUsedPhones() {
           ${safe(x.memo)}
         </div>
 
-        <div class="table-actions">
-          <button class="btn-danger" onclick="deleteUsedPhone(${x.id})">중고폰 삭제</button>
-        </div>
+       <div class="table-actions">
+  <button onclick="showUsedPhoneEdit(${x.id})">수정</button>
+
+  ${
+    x.status !== "판매완료"
+      ? `<button onclick="completeUsedPhone(${x.id})">판매완료</button>`
+      : ""
+  }
+
+  <button class="btn-danger" onclick="deleteUsedPhone(${x.id})">삭제</button>
+</div>
       </div>
     `;
   }).join("");
@@ -832,4 +840,92 @@ async function deletePayback(id) {
 
   alert("삭제 완료");
   showPaybacks();
+}
+async function showUsedPhoneEdit(id) {
+  const { data: item, error } = await supabaseClient
+    .from("used_phones")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    alert("불러오기 실패: " + error.message);
+    return;
+  }
+
+  mainArea.innerHTML = `
+    ${header("중고폰 수정", `${safe(item.model_name)} 수정`)}
+
+    <div class="card">
+      <div class="form-grid">
+        <input id="edit_used_customer_name" value="${safe(item.customer_name)}" placeholder="고객명">
+        <input id="edit_used_model_name" value="${safe(item.model_name)}" placeholder="모델명">
+        <input id="edit_used_buy_price" type="number" value="${item.buy_price || 0}" placeholder="매입가">
+        <input id="edit_used_sell_price" type="number" value="${item.sell_price || 0}" placeholder="판매가">
+
+        <select id="edit_used_status">
+          <option value="재고" ${item.status === "재고" ? "selected" : ""}>재고</option>
+          <option value="판매완료" ${item.status === "판매완료" ? "selected" : ""}>판매완료</option>
+          <option value="보류" ${item.status === "보류" ? "selected" : ""}>보류</option>
+        </select>
+
+        <input id="edit_used_buy_date" type="date" value="${item.buy_date || ""}">
+        <input id="edit_used_sell_date" type="date" value="${item.sell_date || ""}">
+      </div>
+
+      <br>
+      <textarea id="edit_used_memo" placeholder="메모">${safe(item.memo)}</textarea>
+
+      <div class="table-actions">
+        <button onclick="updateUsedPhone(${item.id})">수정 저장</button>
+        <button class="btn-secondary" onclick="showUsedPhones()">취소</button>
+      </div>
+    </div>
+  `;
+}
+
+async function updateUsedPhone(id) {
+  const item = {
+    customer_name: document.getElementById("edit_used_customer_name").value.trim(),
+    model_name: document.getElementById("edit_used_model_name").value.trim(),
+    buy_price: Number(document.getElementById("edit_used_buy_price").value || 0),
+    sell_price: Number(document.getElementById("edit_used_sell_price").value || 0),
+    status: document.getElementById("edit_used_status").value,
+    buy_date: document.getElementById("edit_used_buy_date").value || null,
+    sell_date: document.getElementById("edit_used_sell_date").value || null,
+    memo: document.getElementById("edit_used_memo").value.trim()
+  };
+
+  const { error } = await supabaseClient
+    .from("used_phones")
+    .update(item)
+    .eq("id", id);
+
+  if (error) {
+    alert("수정 실패: " + error.message);
+    return;
+  }
+
+  alert("수정 완료");
+  showUsedPhones();
+}
+
+async function completeUsedPhone(id) {
+  if (!confirm("이 중고폰을 판매완료 처리하시겠습니까?")) return;
+
+  const { error } = await supabaseClient
+    .from("used_phones")
+    .update({
+      status: "판매완료",
+      sell_date: todayText()
+    })
+    .eq("id", id);
+
+  if (error) {
+    alert("처리 실패: " + error.message);
+    return;
+  }
+
+  alert("판매완료 처리되었습니다.");
+  showUsedPhones();
 }
