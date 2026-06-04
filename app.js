@@ -1257,3 +1257,124 @@ async function completeTodayTask(phone, taskType) {
   alert("처리완료 되었습니다.");
   showDashboard();
 }
+async function showStats() {
+  setActive("stats");
+
+  mainArea.innerHTML = `
+    ${header("월별통계", "이번달 매장 운영 숫자를 확인합니다.")}
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>이번달 등록 고객</h3>
+        <div class="number" id="statCustomerCount">0</div>
+      </div>
+
+      <div class="card">
+        <h3>이번달 악세 매출</h3>
+        <div class="number" id="statAccessoryTotal">0원</div>
+      </div>
+
+      <div class="card">
+        <h3>이번달 중고폰 수익</h3>
+        <div class="number" id="statUsedProfit">0원</div>
+      </div>
+
+      <div class="card">
+        <h3>이번달 페이백 총액</h3>
+        <div class="number" id="statPaybackTotal">0원</div>
+      </div>
+
+      <div class="card">
+        <h3>미지급 페이백</h3>
+        <div class="number" id="statUnpaidPayback">0원</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>이번달 요약</h2>
+      <div id="statSummary">불러오는 중...</div>
+    </div>
+  `;
+
+  loadStats();
+}
+
+async function loadStats() {
+  const monthStart = monthStartText();
+
+  const { data: customers } = await supabaseClient
+    .from("customers")
+    .select("*")
+    .gte("created_at", monthStart);
+
+  const { data: accessories } = await supabaseClient
+    .from("accessories")
+    .select("*")
+    .gte("sale_date", monthStart);
+
+  const { data: usedPhones } = await supabaseClient
+    .from("used_phones")
+    .select("*")
+    .gte("sell_date", monthStart);
+
+  const { data: paybacks } = await supabaseClient
+    .from("paybacks")
+    .select("*");
+
+  const customerCount = (customers || []).length;
+
+  const accessoryTotal = (accessories || [])
+    .reduce((sum, x) => sum + Number(x.amount || 0), 0);
+
+  const soldUsedPhones = (usedPhones || [])
+    .filter(x => x.status === "판매완료");
+
+  const usedProfit = soldUsedPhones
+    .reduce((sum, x) => sum + (Number(x.sell_price || 0) - Number(x.buy_price || 0)), 0);
+
+  const monthPaybacks = (paybacks || [])
+    .filter(x => x.pay_date && x.pay_date >= monthStart);
+
+  const paybackTotal = monthPaybacks
+    .reduce((sum, x) => sum + Number(x.amount || 0), 0);
+
+  const unpaidPayback = (paybacks || [])
+    .filter(x => x.status === "미지급")
+    .reduce((sum, x) => sum + Number(x.amount || 0), 0);
+
+  document.getElementById("statCustomerCount").innerText = customerCount;
+  document.getElementById("statAccessoryTotal").innerText = won(accessoryTotal);
+  document.getElementById("statUsedProfit").innerText = won(usedProfit);
+  document.getElementById("statPaybackTotal").innerText = won(paybackTotal);
+  document.getElementById("statUnpaidPayback").innerText = won(unpaidPayback);
+
+  document.getElementById("statSummary").innerHTML = `
+    <div class="list-row">
+      <div class="row-title">
+        <span>이번달 신규 등록 고객</span>
+        <span class="badge">${customerCount}명</span>
+      </div>
+    </div>
+
+    <div class="list-row">
+      <div class="row-title">
+        <span>이번달 중고폰 판매대수</span>
+        <span class="badge">${soldUsedPhones.length}대</span>
+      </div>
+    </div>
+
+    <div class="list-row">
+      <div class="row-title">
+        <span>이번달 악세사리 판매건수</span>
+        <span class="badge">${(accessories || []).length}건</span>
+      </div>
+    </div>
+
+    <div class="list-row">
+      <div class="row-title">
+        <span>이번달 페이백 건수</span>
+        <span class="badge">${monthPaybacks.length}건</span>
+      </div>
+    </div>
+  `;
+}
