@@ -659,6 +659,10 @@ async function loadAccessories() {
         <div class="row-meta">
           판매일: ${x.sale_date || "-"} / 담당자: ${safe(x.manager)}
         </div>
+        <div class="table-actions">
+  <button onclick="showAccessoryEdit(${x.id})">수정</button>
+  <button class="btn-danger" onclick="deleteAccessory(${x.id})">삭제</button>
+</div>
       </div>
     `).join("")}
   `;
@@ -927,5 +931,83 @@ async function completeUsedPhone(id) {
   }
 
   alert("판매완료 처리되었습니다.");
+  async function showAccessoryEdit(id) {
+  const { data: item, error } = await supabaseClient
+    .from("accessories")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    alert("불러오기 실패: " + error.message);
+    return;
+  }
+
+  mainArea.innerHTML = `
+    ${header("악세사리 수정", `${safe(item.item_name)} 수정`)}
+
+    <div class="card">
+      <div class="form-grid">
+        <input id="edit_acc_customer_name" value="${safe(item.customer_name)}" placeholder="고객명">
+        <input id="edit_acc_item_name" value="${safe(item.item_name)}" placeholder="품목">
+        <input id="edit_acc_amount" type="number" value="${item.amount || 0}" placeholder="판매금액">
+        <input id="edit_acc_manager" value="${safe(item.manager)}" placeholder="담당자">
+        <input id="edit_acc_sale_date" type="date" value="${item.sale_date || ""}">
+      </div>
+
+      <br>
+
+      <div class="table-actions">
+        <button onclick="updateAccessory(${item.id})">수정 저장</button>
+        <button class="btn-secondary" onclick="showAccessories()">취소</button>
+      </div>
+    </div>
+  `;
+}
+
+async function updateAccessory(id) {
+  const item = {
+    customer_name: document.getElementById("edit_acc_customer_name").value.trim(),
+    item_name: document.getElementById("edit_acc_item_name").value.trim(),
+    amount: Number(document.getElementById("edit_acc_amount").value || 0),
+    manager: document.getElementById("edit_acc_manager").value.trim(),
+    sale_date: document.getElementById("edit_acc_sale_date").value || todayText()
+  };
+
+  if (!item.item_name || !item.amount) {
+    alert("품목과 판매금액을 입력하세요.");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("accessories")
+    .update(item)
+    .eq("id", id);
+
+  if (error) {
+    alert("수정 실패: " + error.message);
+    return;
+  }
+
+  alert("수정 완료");
+  showAccessories();
+}
+
+async function deleteAccessory(id) {
+  if (!confirm("이 악세사리 판매내역을 삭제하시겠습니까?")) return;
+
+  const { error } = await supabaseClient
+    .from("accessories")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("삭제 실패: " + error.message);
+    return;
+  }
+
+  alert("삭제 완료");
+  showAccessories();
+}
   showUsedPhones();
 }
