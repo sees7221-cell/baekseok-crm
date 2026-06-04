@@ -189,7 +189,7 @@ function showCustomers() {
 
     <div class="card">
       <h2>고객 목록</h2>
-      <input id="search" placeholder="고객명 또는 번호 검색" onkeyup="loadCustomers()">
+      <input id="search" placeholder="고객명 또는 번호 입력 (최근 50명 표시)" onkeyup="loadCustomers()">
       <br><br>
       <div id="customerList"></div>
     </div>
@@ -231,11 +231,20 @@ async function loadCustomers() {
   const list = document.getElementById("customerList");
   const keyword = document.getElementById("search") ? document.getElementById("search").value.trim() : "";
 
-  let query = supabaseClient.from("customers").select("*").order("id", { ascending: false });
+ let query = supabaseClient
+  .from("customers")
+  .select("*")
+  .order("id", { ascending: false })
+  .limit(50);
 
   if (keyword) {
-    query = query.or(`name.ilike.%${keyword}%,phone.ilike.%${keyword}%`);
-  }
+  query = supabaseClient
+    .from("customers")
+    .select("*")
+    .or(`name.ilike.%${keyword}%,phone.ilike.%${keyword}%`)
+    .order("id", { ascending: false })
+    .limit(100);
+}
 
   const { data, error } = await query;
 
