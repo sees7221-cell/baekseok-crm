@@ -894,13 +894,17 @@ function showSettings() {
 
   mainArea.innerHTML = `
     ${header("설정", "CRM 설정")}
-    <button onclick="downloadCustomerCSV()">
-  고객 CSV 다운로드
-</button>
 
     <div class="card">
       <h2>백석점 CRM v1</h2>
       <p>고객관리 / 고객이력 / 금일할일 / 중고폰 / 악세사리 / 페이백</p>
+    </div>
+
+    <div class="card">
+      <h2>데이터 백업</h2>
+      <p>고객 데이터를 CSV 파일로 다운로드합니다.</p>
+      <br>
+      <button onclick="downloadCustomerCSV()">고객 CSV 다운로드</button>
     </div>
   `;
 }
