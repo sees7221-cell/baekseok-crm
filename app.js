@@ -1261,6 +1261,61 @@ async function showStats() {
   setActive("stats");
 
   mainArea.innerHTML = `
+    <h1>월별통계</h1>
+
+    <div class="card-grid">
+
+      <div class="card">
+        <h3>이번달 고객등록</h3>
+        <div class="number" id="statCustomerCount">0</div>
+      </div>
+
+      <div class="card">
+        <h3>이번달 악세매출</h3>
+        <div class="number" id="statAccessoryTotal">0원</div>
+      </div>
+
+    </div>
+  `;
+
+  loadStats();
+}
+
+async function loadStats() {
+
+  const monthStart = new Date();
+  monthStart.setDate(1);
+
+  const monthStartText =
+    monthStart.toISOString().slice(0, 10);
+
+  const { data: customers } = await supabaseClient
+    .from("customers")
+    .select("*")
+    .gte("created_at", monthStartText);
+
+  const { data: accessories } = await supabaseClient
+    .from("accessories")
+    .select("*")
+    .gte("sale_date", monthStartText);
+
+  const customerCount =
+    (customers || []).length;
+
+  const accessoryTotal =
+    (accessories || []).reduce(
+      (sum, x) => sum + Number(x.amount || 0),
+      0
+    );
+
+  document.getElementById("statCustomerCount").innerText =
+    customerCount;
+
+  document.getElementById("statAccessoryTotal").innerText =
+    won(accessoryTotal);
+}
+
+  mainArea.innerHTML = `
     ${header("월별통계", "이번달 매장 운영 숫자를 확인합니다.")}
 
     <div class="card-grid">
