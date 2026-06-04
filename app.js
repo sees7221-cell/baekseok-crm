@@ -473,17 +473,20 @@ async function loadCustomerLogs(phone) {
         <span>${safe(x.log_type)}</span>
         <span class="badge">${safe(x.writer)}</span>
       </div>
-      <div class="row-meta">${safe(x.content)}<br>${formatDate(x.created_at)}</div>
+
+      <div class="row-meta">
+        ${safe(x.content)}<br>
+        ${formatDate(x.created_at)}
+      </div>
+
       <div class="table-actions">
-  <button class="btn-danger"
-    onclick="deleteCustomerLog(${x.id}, '${phone}')">
-    이력삭제
-  </button>
-</div>
+        <button class="btn-danger" onclick="deleteCustomerLog(${x.id}, '${phone}')">
+          이력삭제
+        </button>
+      </div>
     </div>
   `).join("");
 }
-
 /* 중고폰관리 */
 
 async function showUsedPhones() {
