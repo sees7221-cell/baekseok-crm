@@ -155,16 +155,6 @@ function taskRow(c, type) {
     </div>
   `;
 }
-  return `
-    <div class="list-row" onclick="showCustomerDetail('${c.phone}')">
-      <div class="row-title">
-        <span>${safe(c.name)} / ${safe(c.phone)}</span>
-        <span class="badge">${type}</span>
-      </div>
-      <div class="row-meta">${safe(c.carrier)} / ${safe(c.plan)}<br>${safe(c.memo)}</div>
-    </div>
-  `;
-}
 
 function showTodayTasks() {
   setActive("today");
