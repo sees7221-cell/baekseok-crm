@@ -1387,53 +1387,7 @@ async function loadStats() {
   const usedProfit = soldUsedPhones
     .reduce((sum, x) => sum + (Number(x.sell_price || 0) - Number(x.buy_price || 0)), 0);
 
-  const monthPaybacks = (paybacks || [])
-    .filter(x => x.pay_date && x.pay_date >= monthStart);
-
-  const paybackTotal = monthPaybacks
-    .reduce((sum, x) => sum + Number(x.amount || 0), 0);
-
-  const unpaidPayback = (paybacks || [])
-    .filter(x => x.status === "미지급")
-    .reduce((sum, x) => sum + Number(x.amount || 0), 0);
-
-  document.getElementById("statCustomerCount").innerText = customerCount;
-  document.getElementById("statAccessoryTotal").innerText = won(accessoryTotal);
-  document.getElementById("statUsedProfit").innerText = won(usedProfit);
-  document.getElementById("statPaybackTotal").innerText = won(paybackTotal);
-  document.getElementById("statUnpaidPayback").innerText = won(unpaidPayback);
-
-  document.getElementById("statSummary").innerHTML = `
-    <div class="list-row">
-      <div class="row-title">
-        <span>이번달 신규 등록 고객</span>
-        <span class="badge">${customerCount}명</span>
-      </div>
-    </div>
-
-    <div class="list-row">
-      <div class="row-title">
-        <span>이번달 중고폰 판매대수</span>
-        <span class="badge">${soldUsedPhones.length}대</span>
-      </div>
-    </div>
-
-    <div class="list-row">
-      <div class="row-title">
-        <span>이번달 악세사리 판매건수</span>
-        <span class="badge">${(accessories || []).length}건</span>
-      </div>
-    </div>
-
-    <div class="list-row">
-      <div class="row-title">
-        <span>이번달 페이백 건수</span>
-        <span class="badge">${monthPaybacks.length}건</span>
-      </div>
-    </div>
-  `;
-}
-async function showStats() {
+  async function showStats() {
   setActive("stats");
 
   mainArea.innerHTML = `
