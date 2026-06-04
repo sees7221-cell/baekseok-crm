@@ -252,7 +252,10 @@ async function showCustomerDetail(phone) {
       <p><b>요금제변경일:</b> ${c.plan_change_date || "-"}</p>
       <p><b>부가서비스해지일:</b> ${c.addon_end_date || "-"}</p>
       <p><b>특이사항:</b> ${c.memo || "-"}</p>
-
+<br>
+<div class="notice" id="customerSummary">
+  방문 요약 불러오는 중...
+</div>
       <div class="table-actions">
         <button class="btn-secondary" onclick="showCustomers()">목록으로</button>
         <button onclick="showCustomerEdit('${c.phone}')">고객정보 수정</button>
@@ -286,7 +289,7 @@ async function showCustomerDetail(phone) {
       <div id="customerLogList">불러오는 중...</div>
     </div>
   `;
-
+loadCustomerSummary(c.phone);
   loadCustomerLogs(c.phone);
 }
 
@@ -1089,4 +1092,38 @@ async function deleteAccessory(id) {
   showAccessories();
 }
   showUsedPhones();
+}
+async function loadCustomerSummary(phone) {
+  const { data, error } = await supabaseClient
+    .from("customer_logs")
+    .select("*")
+    .eq("customer_phone", phone)
+    .order("id", { ascending: false });
+
+  const box = document.getElementById("customerSummary");
+
+  if (!box) return;
+
+  if (error) {
+    box.innerHTML = "방문 요약 불러오기 실패: " + error.message;
+    return;
+  }
+
+  const count = data ? data.length : 0;
+  const latest = count > 0 ? data[0] : null;
+
+  if (!latest) {
+    box.innerHTML = `
+      방문횟수: <b>0회</b><br>
+      최근이력: 없음
+    `;
+    return;
+  }
+
+  box.innerHTML = `
+    방문횟수: <b>${count}회</b><br>
+    최근이력: <b>${safe(latest.log_type)}</b><br>
+    최근내용: ${safe(latest.content)}<br>
+    최근일자: ${formatDate(latest.created_at)}
+  `;
 }
